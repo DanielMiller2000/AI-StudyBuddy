@@ -9,33 +9,51 @@ Welcome to **AI-Powered Virtual Study Buddy**, a tool designed to make studying 
 
 ## **About the Project**
 
-**AI-Powered Virtual Study Buddy** is an intelligent assistant designed to help students, professionals, and lifelong learners simplify their study routines. It leverages artificial intelligence to automate time-consuming tasks like summarizing long texts, generating flashcards, and answering questions with context-aware accuracy. This tool is ideal for anyone looking to improve learning efficiency, retain information better, and stay organized.
+**AI-Powered Virtual Study Buddy** is an intelligent assistant designed to help students, professionals, and lifelong learners simplify their study routines. It leverages state-of-the-art natural language processing and transformer architectures to automate time-consuming tasks like summarizing long texts, generating flashcards, and answering questions with context-aware accuracy.
 
-The assistant not only adapts to different learning styles but also provides insights into performance, allowing users to focus on areas that need the most attention. Whether you're reviewing for an exam, breaking down complex concepts, or simply organizing your materials, **Study Buddy** has you covered.
+The system utilizes advanced NLP techniques including:
+- **BERT-based Transformers** for semantic understanding and content analysis
+- **Attention Mechanisms** for identifying key concepts and relationships
+- **Extractive and Abstractive Summarization** using encoder-decoder architectures
+- **Probabilistic Keyword Extraction** with domain-specific vocabulary boosting
+- **Semantic Similarity Analysis** using word embeddings and contextual representations
 
-Unlike generic AI tools, **Study Buddy** is designed specifically for learning. It integrates seamlessly with existing study workflows, offering features like keyword extraction, performance tracking, and AI-driven personalization. It’s more than just a tool—it’s a study partner that evolves with your needs and helps you achieve your academic goals.
+Unlike generic AI tools, **Study Buddy** is designed specifically for learning, implementing specialized NLP pipelines:
+- Text preprocessing with custom tokenization and cleaning
+- TF-IDF and statistical analysis for content importance
+- Multi-head attention for context-aware summarization
+- Bidirectional encoding for comprehensive text understanding
+- Fine-tuned transformer models for educational content
 
 ---
 
 ## Key Features
 
 - **AI Summarizer**
-  - Converts lengthy texts into clear, concise summaries for faster review.
+  - Leverages BERT-based transformers for semantic understanding
+  - Combines extractive and abstractive summarization techniques
+  - Uses attention mechanisms to identify crucial information
+  - Maintains context coherence through bidirectional analysis
 
 - **Flashcard Generator**
-  - Creates personalized flashcards to help you memorize key concepts.
+  - Employs statistical and neural keyword extraction
+  - Utilizes semantic similarity for content organization
+  - Implements spaced repetition algorithms
+  - Features probabilistic importance scoring
 
 - **Study Chat Assistant**
-  - Provides instant explanations, quizzes, and concept reviews based on your needs.
+  - Built on transformer architecture for contextual understanding
+  - Uses attention mechanisms for relevant information retrieval
+  - Features domain-adapted language models
+  - Implements dynamic context windowing
 
 - **Progress Tracker**
-  - Monitors study sessions and suggests areas for improvement.
-
-- **Custom Learning Paths**
-  - Adapts to individual learning styles and focuses on weak areas.
+  - Utilizes machine learning for performance analysis
+  - Features adaptive learning path generation
+  - Implements knowledge graph representation
+  - Uses probabilistic learning models
 
 ---
-![1](https://github.com/user-attachments/assets/db48225e-89d7-4063-8370-8d4d14e94022)
 
 ## **Why Choose Study Buddy?**
 
@@ -44,39 +62,45 @@ Unlike generic AI tools, **Study Buddy** is designed specifically for learning. 
 - **Versatility:** Suitable for all subjects, whether you're studying science, history, or languages.  
 - **Accessibility:** Designed to work across multiple platforms, so you can study anytime, anywhere.  
 - **Focus:** Helps users stay organized and concentrated with structured workflows and AI-driven recommendations.  
-- **All-in-One Solution:** Combines multiple tools into a single, seamless platform.  
-
-## How It Works
-
-1. **Upload Your Notes or Texts**  
-   Drop your files (PDFs, Word documents, or plain text) or paste your content directly into the platform. The AI automatically scans and processes the text to extract key information.
-
-2. **AI Analysis and Summarization**  
-   The AI breaks down complex material into digestible summaries. It segments lengthy content into manageable sections, ensuring no critical information is lost. Summaries are generated in seconds, making it easy to review large volumes of text quickly.
-
-3. **Generate Flashcards**  
-   Using advanced NLP models, the AI identifies key concepts, terms, and ideas within the text. It then formulates questions and answers, turning them into flashcards that help with memorization and active recall.
-
-4. **Engage with the Chatbot**  
-   The AI-powered chatbot allows users to ask specific questions about the uploaded content. Whether clarifying concepts, testing understanding, or providing quizzes, the chatbot adapts to individual needs and provides instant responses.
-
-5. **Track Progress and Improve**  
-   The platform monitors your interactions, generating performance reports that highlight areas where improvement is needed. Adaptive learning paths are suggested based on your progress, helping you focus on weak points and master topics more effectively.
-
-6. **Access Offline Mode**  
-   Download and sync study materials to access them offline. This ensures learning continuity even without an internet connection, making it ideal for on-the-go studying.
-
----
+- **All-in-One Solution:** Combines multiple tools into a single, seamless platform.
 
 ---
 
 ## Technologies Used
 ![2](https://github.com/user-attachments/assets/1fc4ed1f-f648-4ce0-b1d8-f21b8e73e31e)
 
-- **AI Frameworks:** GPT, TensorFlow, PyTorch.
-- **Backend:** Python and Flask.
-- **Frontend:** React for the user interface.
-- **Database:** PostgreSQL for storing progress and user data.
+### Core NLP Technologies
+- **Transformer Models**
+  - BERT for contextual embeddings and semantic analysis
+  - T5 for text summarization
+  - DistilBERT for lightweight processing
+  - Custom attention mechanisms for educational content
+
+- **Natural Language Processing**
+  - Spacy for text processing and entity recognition
+  - NLTK for linguistic analysis
+  - Custom tokenizers for educational content
+  - Word embeddings (Word2Vec, FastText)
+
+### Framework Stack
+- **AI/ML Frameworks:** 
+  - PyTorch for deep learning models
+  - Transformers library for NLP tasks
+  - scikit-learn for classical ML algorithms
+  - TensorFlow for neural network operations
+
+- **Backend:** 
+  - Python 3.8+
+  - Flask for API endpoints
+  - FastAPI for high-performance services
+
+- **Frontend:** 
+  - React with TypeScript
+  - Redux for state management
+
+- **Database:** 
+  - PostgreSQL for structured data
+  - Redis for caching
 
 ---
 
@@ -135,7 +159,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 - **GitHub:** [Study Buddy Repository](https://github.com/DanielMiller2000/AI-StudyBuddy)
 - **Email:** Support@studybuddy.com  
-- **Twitter:** [@StudyBuddyAI](https://twitter.com/StudyBuddyAI)  
+- **Twitter:** [@StudyBuddyAI](https://x.com/study_buddyai_)  
 
 ---
 
