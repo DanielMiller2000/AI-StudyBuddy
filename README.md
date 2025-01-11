@@ -1,7 +1,7 @@
 # AI-Powered Virtual Study Buddy
 
 **Smart AI Study Assistant for Effective Learning**
-![BOOKBANNER](https://github.com/user-attachments/assets/bcd794d8-97c5-43a3-a47e-e364f15afea1)
+![BOOKBANNER](https://github.com/DanielMiller2000/AI-StudyBuddy/blob/main/assets/BOOKBANNER.png)
 
 Welcome to **AI-Powered Virtual Study Buddy**, a tool designed to make studying easier, faster, and more effective. Whether you're preparing for exams, mastering new topics, or just organizing your notes, this AI-driven assistant helps you stay ahead with summaries, flashcards, and an interactive study chat.
 
