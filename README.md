@@ -67,7 +67,7 @@ Unlike generic AI tools, **Study Buddy** is designed specifically for learning, 
 ---
 
 ## Technologies Used
-![2](https://github.com/user-attachments/assets/1fc4ed1f-f648-4ce0-b1d8-f21b8e73e31e)
+![2](https://github.com/DanielMiller2000/AI-StudyBuddy/blob/main/assets/sblogo.png)
 
 ### Core NLP Technologies
 - **Transformer Models**
