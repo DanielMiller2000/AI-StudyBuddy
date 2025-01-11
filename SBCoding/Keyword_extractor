@@ -1,0 +1,264 @@
+import spacy
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from collections import Counter
+from typing import List, Dict, Set, Tuple
+import yake
+from gensim.models import KeyedVectors
+import logging
+from nltk.corpus import stopwords
+from nltk.collocations import BigramAssocMeasures, BigramCollocationFinder
+import nltk
+import math
+
+class KeywordExtractor:
+    def __init__(self, 
+                 language: str = 'en',
+                 embedding_path: str = None,
+                 domain_vocab: Set[str] = None):
+        """
+        Initialize the keyword extractor with multiple approaches.
+        
+        Args:
+            language (str): Language code ('en', 'es', etc.)
+            embedding_path (str): Path to word embeddings file (Word2Vec format)
+            domain_vocab (Set[str]): Domain-specific vocabulary for boosting terms
+        """
+        # Initialize spaCy
+        self.nlp = spacy.load(f'{language}_core_web_sm')
+        
+        # Download required NLTK data
+        nltk.download('stopwords')
+        nltk.download('punkt')
+        nltk.download('averaged_perceptron_tagger')
+        
+        # Initialize YAKE keyword extractor
+        self.yake_extractor = yake.KeywordExtractor(
+            lan=language,
+            n=3,  # ngrams up to 3
+            dedupLim=0.7,
+            dedupFunc='seqm',
+            windowsSize=1
+        )
+        
+        # Load word embeddings if provided
+        self.word_vectors = None
+        if embedding_path:
+            try:
+                self.word_vectors = KeyedVectors.load_word2vec_format(
+                    embedding_path, binary=True
+                )
+            except Exception as e:
+                logging.warning(f"Could not load word embeddings: {str(e)}")
+        
+        # Store domain vocabulary
+        self.domain_vocab = domain_vocab or set()
+        
+        # Initialize TF-IDF
+        self.tfidf = TfidfVectorizer(
+            ngram_range=(1, 3),
+            stop_words='english',
+            max_features=1000
+        )
+        
+        # Get stopwords
+        self.stop_words = set(stopwords.words(language))
+        
+        # Initialize logging
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+
+    def _extract_ngrams(self, text: str, n: int) -> List[str]:
+        """Extract n-grams from text."""
+        tokens = nltk.word_tokenize(text.lower())
+        ngrams = nltk.ngrams(tokens, n)
+        return [' '.join(gram) for gram in ngrams]
+
+    def _get_statistical_score(self, text: str) -> Dict[str, float]:
+        """Calculate statistical importance of terms using PMI."""
+        tokens = nltk.word_tokenize(text.lower())
+        
+        # Create bigram measures
+        bigram_measures = BigramAssocMeasures()
+        finder = BigramCollocationFinder.from_words(tokens)
+        
+        # Apply frequency filter
+        finder.apply_freq_filter(2)
+        
+        # Calculate PMI scores
+        pmi_scores = finder.score_ngrams(bigram_measures.pmi)
+        
+        return {' '.join(bigram): score for bigram, score in pmi_scores}
+
+    def _get_embedding_similarity(self, term: str, text: str) -> float:
+        """Calculate semantic similarity using word embeddings."""
+        if not self.word_vectors:
+            return 0.0
+            
+        try:
+            # Get term embedding
+            term_tokens = term.split()
+            term_vectors = [
+                self.word_vectors[token] 
+                for token in term_tokens 
+                if token in self.word_vectors
+            ]
+            
+            if not term_vectors:
+                return 0.0
+                
+            term_embedding = np.mean(term_vectors, axis=0)
+            
+            # Get text embedding
+            text_tokens = text.split()
+            text_vectors = [
+                self.word_vectors[token]
+                for token in text_tokens
+                if token in self.word_vectors
+            ]
+            
+            if not text_vectors:
+                return 0.0
+                
+            text_embedding = np.mean(text_vectors, axis=0)
+            
+            # Calculate cosine similarity
+            similarity = np.dot(term_embedding, text_embedding) / (
+                np.linalg.norm(term_embedding) * np.linalg.norm(text_embedding)
+            )
+            
+            return float(similarity)
+            
+        except Exception:
+            return 0.0
+
+    def _get_domain_score(self, term: str) -> float:
+        """Calculate domain relevance score."""
+        if not self.domain_vocab:
+            return 0.0
+            
+        term_tokens = set(term.split())
+        matches = term_tokens.intersection(self.domain_vocab)
+        return len(matches) / len(term_tokens) if term_tokens else 0.0
+
+    def _get_positional_score(self, term: str, text: str) -> float:
+        """Calculate score based on term position in text."""
+        first_occurrence = text.lower().find(term.lower())
+        if first_occurrence == -1:
+            return 0.0
+            
+        # Normalize by text length
+        return 1.0 - (first_occurrence / len(text))
+
+    def extract_keywords(self, 
+                        text: str, 
+                        num_keywords: int = 10,
+                        min_length: int = 3) -> List[Dict[str, any]]:
+        """
+        Extract keywords using multiple approaches and combine scores.
+        
+        Args:
+            text (str): Input text
+            num_keywords (int): Number of keywords to extract
+            min_length (int): Minimum keyword length
+            
+        Returns:
+            List[Dict]: List of dictionaries containing keywords and their scores
+        """
+        try:
+            # Process text with spaCy
+            doc = self.nlp(text)
+            
+            # Extract candidate terms (nouns, proper nouns, and noun phrases)
+            candidates = set()
+            for token in doc:
+                if token.pos_ in {'NOUN', 'PROPN'} and len(token.text) >= min_length:
+                    candidates.add(token.text.lower())
+            
+            for chunk in doc.noun_chunks:
+                if len(chunk.text) >= min_length:
+                    candidates.add(chunk.text.lower())
+            
+            # Add n-grams
+            for n in range(2, 4):
+                candidates.update(self._extract_ngrams(text, n))
+            
+            # Calculate various scores for each candidate
+            keyword_scores = []
+            for term in candidates:
+                if len(term) < min_length or term in self.stop_words:
+                    continue
+                    
+                # Get YAKE score
+                yake_score = self.yake_extractor.extract_keywords(term)[0][1]
+                
+                # Get statistical score
+                stat_scores = self._get_statistical_score(text)
+                stat_score = stat_scores.get(term, 0.0)
+                
+                # Get embedding similarity
+                emb_score = self._get_embedding_similarity(term, text)
+                
+                # Get domain relevance score
+                domain_score = self._get_domain_score(term)
+                
+                # Get positional score
+                pos_score = self._get_positional_score(term, text)
+                
+                # Combine scores with weights
+                combined_score = (
+                    0.3 * (1 - yake_score) +  # YAKE score (inverse as lower is better)
+                    0.2 * stat_score +         # Statistical score
+                    0.2 * emb_score +          # Embedding similarity
+                    0.2 * domain_score +       # Domain relevance
+                    0.1 * pos_score            # Positional score
+                )
+                
+                keyword_scores.append({
+                    'keyword': term,
+                    'score': combined_score,
+                    'scores': {
+                        'yake': 1 - yake_score,
+                        'statistical': stat_score,
+                        'embedding': emb_score,
+                        'domain': domain_score,
+                        'positional': pos_score
+                    }
+                })
+            
+            # Sort by combined score and return top keywords
+            keyword_scores.sort(key=lambda x: x['score'], reverse=True)
+            return keyword_scores[:num_keywords]
+            
+        except Exception as e:
+            self.logger.error(f"Error extracting keywords: {str(e)}")
+            return []
+
+    def extract_keywords_with_context(self, 
+                                    text: str,
+                                    window_size: int = 50) -> List[Dict[str, any]]:
+        """
+        Extract keywords with surrounding context.
+        
+        Args:
+            text (str): Input text
+            window_size (int): Number of characters for context window
+            
+        Returns:
+            List[Dict]: Keywords with their context
+        """
+        keywords = self.extract_keywords(text)
+        
+        for keyword in keywords:
+            term = keyword['keyword']
+            pos = text.lower().find(term.lower())
+            
+            if pos != -1:
+                start = max(0, pos - window_size)
+                end = min(len(text), pos + len(term) + window_size)
+                context = text[start:end]
+                
+                keyword['context'] = context
+                keyword['position'] = pos
+        
+        return keywords
